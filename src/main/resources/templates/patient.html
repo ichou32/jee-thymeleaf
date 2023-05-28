@@ -34,10 +34,13 @@
                        <td th:text="${p.dateNaissance}"></td>
                        <td th:text="${p.malade}"></td>
                        <td th:text="${p.score}"></td>
-                       <td>
-                           <a onclick="javascript:return confirm('are u sure you want to delete this patient')" th:href="@{delete(id=${p.id})}" class="btn btn-danger">Delete</a>
+                       <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                           <a onclick="javascript:return confirm('are u sure you want to delete this patient')" th:href="@{/admin/delete(id=${p.id})}" class="btn btn-danger">Delete</a>
                        </td>
-                   </tr>
+                       <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                           <a th:href="@{/admin/editPatient(id=${p.id}, keyword=${keyword}, page=${currentPage})}" class="btn btn-success">Edit</a>
+                       </td>
+                   </tr>as
                    </tbody>
                </table>
                <ul class="nav nav-pills">

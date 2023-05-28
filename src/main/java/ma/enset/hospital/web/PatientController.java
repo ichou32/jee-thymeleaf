@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-
 @Controller
 @AllArgsConstructor
 public class PatientController {
@@ -32,22 +30,38 @@ public class PatientController {
         model.addAttribute("keyword", kw);
         return "patient";
     }
-    @GetMapping("/delete")
+    @GetMapping("/admin/delete")
+//    @PreAuthorize("ADMIN")
     public String delete(long id){
         patientRepository.deleteById(id);
             return "redirect:/index";
     }
 
-    @GetMapping("/formPatients")
+    @GetMapping("/admin/formPatient")
+//    @PreAuthorize("ADMIN")
     public String formPatient(Model model){
         model.addAttribute("patient", new Patient());
-        return "formPatient";
+        return "/formPatient";
     }
 
-    @PostMapping("/save")
-    public String save(Model model, @Valid Patient patient, BindingResult bindingResult){
+    @PostMapping("/admin/save")
+//    @PreAuthorize("ADMIN")
+    public String save(Model model, @Valid Patient patient, BindingResult bindingResult,
+                       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "") String keyword){
         if(bindingResult.hasErrors()) return "formPatient";
         patientRepository.save(patient);
-        return "redirect:/formPatient";
+        return "redirect:/index?page="+page+"&keyword="+keyword;
+    }
+
+    @GetMapping("/admin/editPatient")
+//    @PreAuthorize("ADMIN")
+    public String editPatient(Model model, long id, String keyword, int page){
+        Patient patient =patientRepository.findById(id).orElse(null);
+        if(patient==null) throw new RuntimeException("patient introuvable");
+
+        model.addAttribute("patient", patient);
+        model.addAttribute("page", page);
+        model.addAttribute("keyword", keyword);
+        return "editPatient";
     }
 }
